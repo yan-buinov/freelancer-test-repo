@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <link rel="stylesheet" th:href="@{/assets/fragments/company-search.css}">
+</head>
+
+<body>
+<main layout:fragment="content">
+    <div>
+        <wa-card style="margin-bottom: var(--wa-space-m);">
+            <div style="padding: var(--wa-space-xl);">
+                <form id="createCompanyForm"
+                      th:object="${createUserRequest}"
+                      th:hx-post="'/htmx/users/create'"
+                      th:hx-target="'#r-callout'"
+                      th:hx-target-error="'#r-callout'"
+                      th:hx-swap="'innerHTML'"
+                      th:hx-indicator="'#loading-indicator'">
+                    <div class="wa-stack">
+                        <div>
+                            <wa-input
+                                name="email"
+                                id="email"
+                                th:field="*{email}"
+                                th:label="#{email.label}"
+                                type="email"
+                                required>
+                            </wa-input>
+
+                            <wa-input
+                                name="password"
+                                id="password"
+                                th:field="*{password}"
+                                th:label="#{password.label}"
+                                type="password"
+                                required>
+                            </wa-input>
+
+                            <wa-select
+                                name="tenantRole"
+                                id="tenantRole"
+                                th:field="*{tenantRole}"
+                                th:label="#{user.create.form.role.label}"
+                                required>
+                                <wa-option
+                                    th:each="roleOption : ${roleOptions}"
+                                    th:value="${roleOption.name()}"
+                                    th:text="${roleOption.name()}">
+                                </wa-option>
+                            </wa-select>
+
+                            <div style="display: flex; gap: 1rem; align-items: center;">
+                                <wa-button class="disabled:r-opacity-25"
+                                           type="submit" variant="success"
+                                           size="small"
+                                           id="submitButton">
+                                    <span th:text="#{user.create.form.submit.button}"></span>
+                                    <wa-spinner slot="end" id="loading-indicator" class="htmx-indicator"></wa-spinner>
+                                </wa-button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </wa-card>
+    </div>
+</main>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/assets/tenant/create.js}"></script>
+</th:block>
+</body>
+</html>

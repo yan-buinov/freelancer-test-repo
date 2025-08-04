@@ -93,6 +93,21 @@ class UserService(
         userTenantRoleRepository.save(userTenantRole)
     }
 
+    fun registerUserWithRole(
+        email: String,
+        password: String,
+        role: TenantRoleCode,
+        user: UserContext
+    ) {
+        val loginPayload = signupByEmailPassword(email, password)
+        val tenantId = user.currentTenant!!.id
+        val userTenant = getOrCreateUserTenant(loginPayload.id, tenantId)
+        val userTenantRoleId = UserTenantRoleId(tenantId, loginPayload.id)
+        val tenantRole = tenantService.findTenantRoleByCode(role);
+        val userTenantRole = UserTenantRole(userTenantRoleId, userTenant, tenantRole)
+        userTenantRoleRepository.save(userTenantRole)
+    }
+
     fun getOrCreateUserTenant(userId: Long, tenantId: Long): UserTenant {
         return userTenantRepository.findUserTenantByUserIdAndTenantId(userId, tenantId)
             ?: run {

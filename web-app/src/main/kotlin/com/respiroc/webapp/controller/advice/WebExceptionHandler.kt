@@ -6,6 +6,7 @@ import com.respiroc.webapp.controller.BaseController
 import com.respiroc.webapp.controller.response.Callout
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpStatus
+import org.springframework.security.authorization.AuthorizationDeniedException
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -32,5 +33,16 @@ class WebExceptionHandler : BaseController() {
     fun handleRestClientException(model: Model): String {
         model.addAttribute(calloutAttributeName, Callout.Error("REST API Client Error"))
         return "fragments/r-callout"
+    }
+    @ExceptionHandler(AuthorizationDeniedException::class)
+    fun handleAuthorizationDeniedException(model: Model, e: AuthorizationDeniedException): String {
+        model.addAttribute(calloutAttributeName, Callout.Error("Forbidden"))
+        return "error/403"
+    }
+
+    @ExceptionHandler(Exception::class)
+    fun handleException(ex: Exception): String {
+        ex.printStackTrace();
+        return ""
     }
 }

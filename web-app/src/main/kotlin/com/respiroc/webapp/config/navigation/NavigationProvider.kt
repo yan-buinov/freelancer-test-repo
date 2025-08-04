@@ -1,28 +1,32 @@
 package com.respiroc.webapp.config.navigation
 
+import com.respiroc.webapp.security.SecurityFacade
 import org.springframework.stereotype.Component
 
 @Component
-class NavigationProvider {
-    fun getNavigationSections(): List<NavigationSection> {
-        return listOf(
-            NavigationSection(
-                title = "Dashboard", icon = "dashboard",
-                items = listOf(NavigationSectionItem(label = "Home", url = "/dashboard"))
-            ),
+class NavigationProvider(
+    private val securityFacade: SecurityFacade
+) {
 
-            NavigationSection(
-                title = "Vouchers", icon = "file-text",
-                items = listOf(
-                    NavigationSectionItem(label = "Overview", url = "/voucher/overview"),
-                    NavigationSectionItem(label = "Advanced Voucher", url = "/voucher/new-advanced-voucher"),
-                    NavigationSectionItem(label = "Reception", url = "/voucher-reception")
-                )
-            ),
+    fun getNavigationSections(): List<NavigationSection> = buildList {
+        addDashboardSection()
+        addVouchersSection()
+        addAccountsSection()
+        addReportsSection()
+        addContactSection()
+        addBankSection()
+        if (securityFacade.hasAuthority("all:write")) {
+            addUsersSection()
+        }
+    }
 
+    private fun MutableList<NavigationSection>.addDashboardSection() {
+        add(
             NavigationSection(
-                title = "Accounts", icon = "receipt",
+                title = "Dashboard",
+                icon = "dashboard",
                 items = listOf(
+<<<<<<< Updated upstream
                     NavigationSectionItem(label = "General Ledger", url = "/ledger/general"),
                     NavigationSectionItem(label = "Chart of Accounts", url = "/ledger/chart-of-accounts"),
                     NavigationSectionItem(label = "Supplier", url = "/ledger/suppliers"),
@@ -52,6 +56,9 @@ class NavigationProvider {
                 title = "Bank", icon = "bank",
                 items = listOf(
                     NavigationSectionItem(label = "Bank Accounts Overview", url = "/bank/account"),
+=======
+                    NavigationSectionItem("Home", "/dashboard")
+>>>>>>> Stashed changes
                 )
             ),
 
@@ -64,4 +71,87 @@ class NavigationProvider {
             )
         )
     }
+
+    private fun MutableList<NavigationSection>.addVouchersSection() {
+        add(
+            NavigationSection(
+                title = "Vouchers",
+                icon = "file-text",
+                items = listOf(
+                    "Overview" to "/voucher/overview",
+                    "Advanced Voucher" to "/voucher/new-advanced-voucher",
+                    "Reception" to "/voucher-reception"
+                ).map(::toItem)
+            )
+        )
+    }
+
+    private fun MutableList<NavigationSection>.addAccountsSection() {
+        add(
+            NavigationSection(
+                title = "Accounts",
+                icon = "receipt",
+                items = listOf(
+                    "General Ledger" to "/ledger/general",
+                    "Chart of Accounts" to "/ledger/chart-of-accounts"
+                ).map(::toItem)
+            )
+        )
+    }
+
+    private fun MutableList<NavigationSection>.addReportsSection() {
+        add(
+            NavigationSection(
+                title = "Reports",
+                icon = "chart-simple",
+                items = listOf(
+                    "Trial Balance" to "/report/trial-balance",
+                    "Profit & Loss" to "/report/profit-loss",
+                    "Balance Sheet" to "/report/balance-sheet"
+                ).map(::toItem)
+            )
+        )
+    }
+
+    private fun MutableList<NavigationSection>.addContactSection() {
+        add(
+            NavigationSection(
+                title = "Contact",
+                icon = "users",
+                items = listOf(
+                    "Customers" to "/contact/customer",
+                    "Suppliers" to "/contact/supplier",
+                    "New Customer" to "/contact/customer/new",
+                    "New Supplier" to "/contact/supplier/new"
+                ).map(::toItem)
+            )
+        )
+    }
+
+    private fun MutableList<NavigationSection>.addBankSection() {
+        add(
+            NavigationSection(
+                title = "Bank",
+                icon = "bank",
+                items = listOf(
+                    "Bank Accounts Overview" to "/bank/account"
+                ).map(::toItem)
+            )
+        )
+    }
+
+    private fun MutableList<NavigationSection>.addUsersSection() {
+        add(
+            NavigationSection(
+                title = "Users",
+                icon = "user-plus",
+                items = listOf(
+                    "Create new User in tenant" to "/users/new"
+                ).map(::toItem)
+            )
+        )
+    }
+
+    private fun toItem(pair: Pair<String, String>) =
+        NavigationSectionItem(label = pair.first, url = pair.second)
 }
